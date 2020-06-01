@@ -5,7 +5,6 @@ import static io.netty.handler.ssl.ApplicationProtocolConfig.Protocol.ALPN;
 import static io.netty.handler.ssl.ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT;
 import static io.netty.handler.ssl.ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE;
 import static io.netty.handler.ssl.ApplicationProtocolNames.HTTP_1_1;
-import static io.netty.handler.ssl.ApplicationProtocolNames.HTTP_2;
 import static io.netty.handler.ssl.SupportedCipherSuiteFilter.INSTANCE;
 
 import java.io.File;
@@ -41,7 +40,7 @@ public class Server {
 		// Configure SSL.
 		SslContext sslCtx = null;
 		if (serverProperties.getAdminSSLEnabled()) {
-			ApplicationProtocolConfig applicationProtocolConfig = new ApplicationProtocolConfig(ALPN,NO_ADVERTISE,ACCEPT,HTTP_2,HTTP_1_1);
+			ApplicationProtocolConfig applicationProtocolConfig = new ApplicationProtocolConfig(ALPN,NO_ADVERTISE,ACCEPT,HTTP_1_1);
             sslCtx = SslContextBuilder.forServer(serverProperties.getAdminSSLCert(), serverProperties.getAdminSSLKey()).ciphers(CIPHERS,INSTANCE).applicationProtocolConfig(applicationProtocolConfig).build();
 		}
 		// Configure the server.
