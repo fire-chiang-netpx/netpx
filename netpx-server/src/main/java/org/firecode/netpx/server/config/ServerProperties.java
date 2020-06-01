@@ -10,26 +10,26 @@ public class ServerProperties extends ConfigPropertyResolver {
 	private static final ServerProperties serverProperties = new ServerProperties("server.properties");
 	
 	/**
-	 * Server build port
+	 * Server build port（netpx 绑定的端口）
 	 */
 	private Integer buildPort;
 	
 	/**
-	 * Server build ip
+	 * Server build ip（netpx 绑定的ip）
 	 */
 	private String buildHost;
 	
 	/**
-	 * Server build domain name
+	 * Server build domain name（netpx 绑定的域名）
 	 */
 	private String buildName;
 	
 	/**
-	 * Enabled admin manager
+	 * Enabled admin manager（是否开启后台管理服务）
 	 */
 	private Boolean adminEnabled;
 	/**
-	 * Admin server domain name
+	 * Admin server domain name（后台管理服务域名）
 	 */
 	private String adminDomain;
 	
