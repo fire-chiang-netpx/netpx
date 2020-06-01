@@ -1,5 +1,7 @@
 package org.firecode.netpx.server.config;
 
+import java.io.File;
+
 import org.firecode.netpx.common.ConfigPropertyResolver;
 
 /**
@@ -32,6 +34,18 @@ public class ServerProperties extends ConfigPropertyResolver {
 	 * Admin server domain name（后台管理服务域名）
 	 */
 	private String adminDomain;
+	/**
+	 * Admin server SSL enabled（后台管理服务是否启用SSL）
+	 */
+	private Boolean adminSSLEnabled;
+	/**
+	 * Admin server SSL certificate（后台管理服务SSL证书）
+	 */
+	private File adminSSLCert;
+	/**
+	 * Admin server SSL key（后台管理服务SSL Key）
+	 */
+	private File adminSSLKey;
 	
 	public Integer getBuildPort() {
 		return buildPort;
@@ -53,6 +67,18 @@ public class ServerProperties extends ConfigPropertyResolver {
 		return adminDomain;
 	}
 
+	public Boolean getAdminSSLEnabled() {
+		return adminSSLEnabled;
+	}
+	
+	public File getAdminSSLCert() {
+		return adminSSLCert;
+	}
+
+	public File getAdminSSLKey() {
+		return adminSSLKey;
+	}
+
 	private ServerProperties(String configFileName) {
 		super(configFileName);
 		adminEnabled = getBoolean("server.admin.enabled");
@@ -60,6 +86,11 @@ public class ServerProperties extends ConfigPropertyResolver {
 		buildHost = getString("server.build.host");
 		buildName = getString("server.build.name");
 		adminDomain = getString("server.admin.build.name");
+		adminSSLEnabled = getBoolean("server.admin.ssl.enabled");
+		if(adminSSLEnabled) {
+			adminSSLCert  = new File(getString("server.admin.ssl.cert"));
+			adminSSLKey = new File(getString("server.admin.ssl.key"));
+		}
 	}
 	
 	public static final ServerProperties getInstance() {
