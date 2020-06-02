@@ -11,8 +11,10 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.firecode.netpx.server.Server;
 import org.firecode.netpx.server.http.support.MediaType;
 import org.firecode.netpx.server.http.support.RequestMapping;
 import org.firecode.netpx.server.http.support.RequestMappingHandler;
@@ -37,6 +39,14 @@ public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpR
 	private static final Logger LOG = LoggerFactory.getLogger(DispatcherHttpHandler.class);
 	
     private static final Map<String,RequestMappingHandlerAdapter> REQUEST_MAPPING_MAP = new ConcurrentHashMap<>();
+    
+    static {
+		PathMatchingResourceClassResolver p = new PathMatchingResourceClassResolver();
+		Set<Class<?>> clazzs = p.doFindMatchingFileClasses(Server.getPackageName());
+		for(Class<?> clazz : clazzs) {
+			System.err.println(clazz);
+		}
+    }
 	
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception {

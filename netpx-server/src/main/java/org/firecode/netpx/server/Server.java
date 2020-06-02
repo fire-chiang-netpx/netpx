@@ -11,6 +11,7 @@ import java.io.File;
 
 import org.firecode.netpx.common.ConfigPropertyResolver;
 import org.firecode.netpx.server.config.ServerProperties;
+import org.firecode.netpx.server.http.PathMatchingResourceClassResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,5 +76,16 @@ public class Server {
 		loggerConfigurator.setContext(loggerContext);
 		loggerContext.reset();
 		loggerConfigurator.doConfigure(Thread.currentThread().getContextClassLoader().getResource(String.join(File.separator, ConfigPropertyResolver.CONFIG_FOLDER, "logback.xml")));
+	}
+	
+	/**
+	 * Get current class package name
+	 * @param fqClassName
+	 * @return
+	 */
+	public static String getPackageName() {
+		String fqClassName = Server.class.getCanonicalName();
+		int lastDotIndex = fqClassName.lastIndexOf(PathMatchingResourceClassResolver.PACKAGE_SEPARATOR);
+		return (lastDotIndex != -1 ? fqClassName.substring(0, lastDotIndex) : "");
 	}
 }
