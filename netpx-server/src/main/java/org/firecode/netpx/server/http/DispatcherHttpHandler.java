@@ -10,6 +10,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +45,14 @@ public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpR
 		PathMatchingResourceClassResolver p = new PathMatchingResourceClassResolver();
 		Set<Class<?>> clazzs = p.doFindMatchingFileClasses(Server.getPackageName());
 		for(Class<?> clazz : clazzs) {
-			System.err.println(clazz);
+			if(RequestMappingHandler.class.isAssignableFrom(clazz) && !RequestMappingHandler.class.equals(clazz)) {
+				try {
+				    RequestMappingHandler<?> requestMappingHandler = (RequestMappingHandler<?>)clazz.getConstructor().newInstance();
+					registerRequestMappingHandler(requestMappingHandler);
+				} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				    LOG.error("Initialization failed "+clazz.getCanonicalName(),e);
+				}
+			}
 		}
     }
 	
@@ -95,7 +103,7 @@ public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpR
      * Register requestMappingHandler（注册Http请求处理器）
      * @param requestMappingHandler
      */
-    public static final void registerRequestMappingHandler(RequestMappingHandler requestMappingHandler) {
+    private static final void registerRequestMappingHandler(RequestMappingHandler<?> requestMappingHandler) {
     	RequestMapping requestMapping = requestMappingHandler.getClass().getAnnotation(RequestMapping.class);
     	if(null != requestMapping) {
     		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter(requestMapping.uri(), requestMapping.method(), requestMapping.produce(), requestMappingHandler);

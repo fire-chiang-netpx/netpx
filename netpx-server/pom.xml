@@ -35,6 +35,10 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.iq80.leveldb</groupId>
 			<artifactId>leveldb</artifactId>
 			<version>${leveldb.version}</version>

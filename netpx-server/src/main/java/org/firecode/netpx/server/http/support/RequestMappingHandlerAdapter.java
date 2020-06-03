@@ -5,7 +5,12 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+import java.util.Objects;
+
+import com.alibaba.fastjson.JSON;
+
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -23,9 +28,9 @@ public class RequestMappingHandlerAdapter {
 	
 	private RequestMethod requestMethod;
 	
-	private RequestMappingHandler requestMappingHandler;
+	private RequestMappingHandler<?> requestMappingHandler;
 	
-	public RequestMappingHandlerAdapter(String uri,RequestMethod requestMethod,MediaType mediaType,RequestMappingHandler requestMappingHandler) {
+	public RequestMappingHandlerAdapter(String uri,RequestMethod requestMethod,MediaType mediaType,RequestMappingHandler<?> requestMappingHandler) {
 		this.uri = uri;
 		this.requestMethod = requestMethod;
 		this.mediaType = mediaType;
@@ -39,7 +44,16 @@ public class RequestMappingHandlerAdapter {
 	public FullHttpResponse handler(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception {
 		ByteBuf content = null;
 		if(req.method().equals(requestMethod.value())) {
-			content = this.requestMappingHandler.handler(ctx, req);
+			content = ctx.alloc().buffer();
+			Object res = this.requestMappingHandler.handler(req);
+			if(!Objects.isNull(res)) {
+				if(MediaType.TEXT_PLAIN_UTF8.equals(mediaType)) {
+					ByteBufUtil.writeUtf8(content, res.toString());
+				}
+				if(MediaType.APPLICATION_JSON_UTF8.equals(mediaType)) {
+					ByteBufUtil.writeUtf8(content,JSON.toJSONString(res));
+				}
+			}
 		}
 		if(content == null) {
 			content = Unpooled.EMPTY_BUFFER;
