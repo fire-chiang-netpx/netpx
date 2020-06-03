@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface RequestMapping {
 	
-	String uri();
+	String[] urls();
 	
 	RequestMethod method();
 	

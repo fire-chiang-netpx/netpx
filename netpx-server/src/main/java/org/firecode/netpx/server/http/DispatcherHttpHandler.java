@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.firecode.netpx.server.Server;
+import org.firecode.netpx.server.http.controller.StaticResourcesController;
 import org.firecode.netpx.server.http.support.MediaType;
 import org.firecode.netpx.server.http.support.RequestMapping;
 import org.firecode.netpx.server.http.support.RequestMappingHandler;
@@ -36,6 +37,10 @@ import io.netty.handler.codec.http.HttpUtil;
  * @author ChiangFire
  */
 public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+	
+	private static final String KEEP_ALIVE_NAME = "Keep-Alive";
+	
+	private static final String KEEP_ALIVE_TIME_OUT = "timeout=30";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DispatcherHttpHandler.class);
 	
@@ -62,25 +67,31 @@ public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpR
         if (HttpUtil.is100ContinueExpected(req)) {
             ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE, Unpooled.EMPTY_BUFFER));
         }
-        boolean keepAlive = HttpUtil.isKeepAlive(req);
-        //ByteBuf content = ctx.alloc().buffer();
-        //content.writeBytes(Http2Handler.RESPONSE_BYTES.duplicate());
-        //ByteBufUtil.writeAscii(content,"");
-        //FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
         FullHttpResponse response;
+        // process static resources
         RequestMappingHandlerAdapter requestMappingHandlerAdapter = REQUEST_MAPPING_MAP.get(uri);
         if(null != requestMappingHandlerAdapter) {
         	response = requestMappingHandlerAdapter.handler(ctx, req);
-        // process 404	
         } else {
-        	response = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND, Unpooled.EMPTY_BUFFER);
-            response.headers().set(CONTENT_TYPE,MediaType.TEXT_PLAIN_UTF8.value());
-            response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
+            if(uri.startsWith(StaticResourcesController.ROOT_STATIC_RESOURCES)) {
+            	uri = StaticResourcesController.ROOT_STATIC_RESOURCES;
+            }
+            requestMappingHandlerAdapter = REQUEST_MAPPING_MAP.get(uri);
+            if(null != requestMappingHandlerAdapter) {
+            	response = requestMappingHandlerAdapter.handler(ctx, req);
+            // process 404	
+            } else {
+            	response = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND, Unpooled.EMPTY_BUFFER);
+                response.headers().set(CONTENT_TYPE,MediaType.TEXT_PLAIN_UTF8.value());
+                response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
+            }
         }
+        boolean keepAlive = HttpUtil.isKeepAlive(req);
         if (keepAlive) {
             if (req.protocolVersion().equals(HTTP_1_0)) {
                 response.headers().set(CONNECTION, KEEP_ALIVE);
             }
+            response.headers().set(KEEP_ALIVE_NAME, KEEP_ALIVE_TIME_OUT);
             ctx.write(response);
         } else {
             response.headers().set(CONNECTION, CLOSE);
@@ -106,8 +117,11 @@ public class DispatcherHttpHandler extends SimpleChannelInboundHandler<FullHttpR
     private static final void registerRequestMappingHandler(RequestMappingHandler<?> requestMappingHandler) {
     	RequestMapping requestMapping = requestMappingHandler.getClass().getAnnotation(RequestMapping.class);
     	if(null != requestMapping) {
-    		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter(requestMapping.uri(), requestMapping.method(), requestMapping.produce(), requestMappingHandler);
-    		REQUEST_MAPPING_MAP.put(requestMapping.uri(),adapter);
+    		String[] urls = requestMapping.urls();
+    		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter(requestMapping.method(), requestMapping.produce(), requestMappingHandler);
+    		for(String url : urls) {
+        		REQUEST_MAPPING_MAP.put(url,adapter);
+    		}
     	}
     }
 }

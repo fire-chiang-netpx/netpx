@@ -6,7 +6,15 @@ public enum MediaType {
 	
 	TEXT_PLAIN_UTF8("text/plain;charset=UTF-8"),
 	
+	TEXT_HTML_UTF8("text/html;charset=UTF-8"),
+	
+	APPLICATION_JAVASCRIPT_UTF8("application/javascript;charset=UTF-8"),
+	
+	TEXT_CSS_UTF8("text/css;charset=UTF-8"),
+	
 	APPLICATION_JSON_UTF8("application/json;charset=UTF-8");
+	
+	
 	
 	private String value;
 	
