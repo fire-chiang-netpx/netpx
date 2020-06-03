@@ -12,9 +12,9 @@ public enum MediaType {
 	
 	TEXT_CSS_UTF8("text/css;charset=UTF-8"),
 	
-	APPLICATION_JSON_UTF8("application/json;charset=UTF-8");
+	APPLICATION_JSON_UTF8("application/json;charset=UTF-8"),
 	
-	
+	AUTO_CONFIGURATION("");
 	
 	private String value;
 	

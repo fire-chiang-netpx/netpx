@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.firecode.netpx.server.Server;
 import org.firecode.netpx.server.http.PathMatchingResourceClassResolver;
-import org.firecode.netpx.server.http.support.MediaType;
 import org.firecode.netpx.server.http.support.RequestMapping;
 import org.firecode.netpx.server.http.support.RequestMappingHandler;
 import org.firecode.netpx.server.http.support.RequestMethod;
@@ -18,7 +17,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
  * Static resources controller（静态资源控制器）
  * @author ChiangFire
  */
-@RequestMapping(urls={StaticResourcesController.ROOT_STATIC_RESOURCES,PathMatchingResourceClassResolver.DEFAULT_PATH_SEPARATOR},method = RequestMethod.GET,produce = MediaType.TEXT_HTML_UTF8)
+@RequestMapping(urls={StaticResourcesController.ROOT_STATIC_RESOURCES,PathMatchingResourceClassResolver.DEFAULT_PATH_SEPARATOR},method = RequestMethod.GET)
 public class StaticResourcesController implements RequestMappingHandler<String> {
 	
 	public static final String ROOT_STATIC_RESOURCES = "/static";

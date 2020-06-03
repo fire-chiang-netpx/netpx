@@ -21,5 +21,5 @@ public @interface RequestMapping {
 	
 	RequestMethod method();
 	
-	MediaType produce();
+	MediaType produce() default MediaType.AUTO_CONFIGURATION;
 }

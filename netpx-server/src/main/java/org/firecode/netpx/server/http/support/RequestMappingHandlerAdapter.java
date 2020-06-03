@@ -48,7 +48,7 @@ public class RequestMappingHandlerAdapter {
 		if(req.method().equals(requestMethod.value())) {
 			Object res = this.requestMappingHandler.handler(req);
 			if(!Objects.isNull(res)) {
-				if(MediaType.TEXT_HTML_UTF8.equals(mediaType) || MediaType.TEXT_PLAIN_UTF8.equals(mediaType)) {
+				if(MediaType.AUTO_CONFIGURATION.equals(mediaType)) {
 					ByteBufUtil.writeUtf8(content, res.toString());
 				}
 				if(MediaType.APPLICATION_JSON_UTF8.equals(mediaType)) {
@@ -60,16 +60,18 @@ public class RequestMappingHandlerAdapter {
 //			content = Unpooled.EMPTY_BUFFER;
 //		}
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
-        String uri = req.uri();
         response.headers().set(CONTENT_TYPE,mediaType.value());
-        if(uri.endsWith(SUFFIX_HTML)) {
-        	response.headers().set(CONTENT_TYPE,MediaType.TEXT_HTML_UTF8.value());
-        }
-        if(uri.endsWith(SUFFIX_JS)) {
-        	response.headers().set(CONTENT_TYPE,MediaType.APPLICATION_JAVASCRIPT_UTF8.value());
-        }
-        if(uri.endsWith(SUFFIX_CSS)) {
-        	response.headers().set(CONTENT_TYPE,MediaType.TEXT_CSS_UTF8.value());
+        if(MediaType.AUTO_CONFIGURATION.equals(mediaType)) {
+            String uri = req.uri();
+            if(uri.endsWith(SUFFIX_HTML)) {
+            	response.headers().set(CONTENT_TYPE,MediaType.TEXT_HTML_UTF8.value());
+            }
+            if(uri.endsWith(SUFFIX_JS)) {
+            	response.headers().set(CONTENT_TYPE,MediaType.APPLICATION_JAVASCRIPT_UTF8.value());
+            }
+            if(uri.endsWith(SUFFIX_CSS)) {
+            	response.headers().set(CONTENT_TYPE,MediaType.TEXT_CSS_UTF8.value());
+            }
         }
         response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
         return response;
