@@ -19,6 +19,9 @@ a {
     text-decoration: none;
     color: inherit;
 }
+.el-input__inner {
+	vertical-align: middle;
+}
 .home-index .el-dropdown-menu {
   margin-top: 20px;
 }
@@ -73,16 +76,12 @@ a {
     border: 1px #efefef solid;
     padding: 10px;
     background: #f9f9f9;
-    display: flex;
-    align-items: center;
 }
 .user-manager-filters .filter {
     display: inline-block;
     width: auto;
     padding: 10px;
     border-radius: 5px;
-    display: flex;
-    align-items: center;
 }
 .user-manager-filters .el-input {
     width: 250px;

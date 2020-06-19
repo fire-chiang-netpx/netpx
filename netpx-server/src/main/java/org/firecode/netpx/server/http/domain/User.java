@@ -35,6 +35,10 @@ public class User {
 	 * User add date time
 	 */
 	private Date createTime;
+	/**
+	 * User remark
+	 */
+	private String remark;
 
 	public String getUsername() {
 		return username;
@@ -82,5 +86,13 @@ public class User {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }
