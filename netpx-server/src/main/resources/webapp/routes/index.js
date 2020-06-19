@@ -4,9 +4,27 @@ define(function(require){
 	Vue.use(VueRouter);
 	
 	return new VueRouter({
-		routes:[{
-	        path: "/config",
-		    component: resolve => requirejs(['views/test/index'],resolve) //Vue.extend(require("views/test/index"))
-		}]
+		routes:[
+            {
+            	// 默认跳转路由
+				path: "/",
+				redirect: "/index"
+		    },{
+		        path: "/index",
+		        // Vue.extend(require("views/test/index"))
+			    component: function(resolve){
+			        return requirejs(['views/index/index'],resolve);	
+			    },
+			    children: [
+			    	{
+				        path: "user-manager",
+				        // Vue.extend(require("views/test/index"))
+					    component: function(resolve){
+					        return requirejs(['views/user-manager/index'],resolve);	
+					    }
+			    	}
+			    ]
+			}
+		]
 	});
 });

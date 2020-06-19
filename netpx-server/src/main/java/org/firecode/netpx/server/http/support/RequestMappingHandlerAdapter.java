@@ -2,6 +2,7 @@ package org.firecode.netpx.server.http.support;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.ACCEPT_RANGES;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -27,6 +28,10 @@ public class RequestMappingHandlerAdapter {
 	
 	private static final String SUFFIX_CSS = ".css";
 	
+	private static final String SUFFIX_WOFF = ".woff";
+	
+	private static final String SUFFIX_TTF = ".ttf";
+	
 	private MediaType mediaType;
 	
 	private RequestMethod requestMethod;
@@ -48,11 +53,15 @@ public class RequestMappingHandlerAdapter {
 		if(req.method().equals(requestMethod.value())) {
 			Object res = this.requestMappingHandler.handler(req);
 			if(!Objects.isNull(res)) {
-				if(MediaType.AUTO_CONFIGURATION.equals(mediaType)) {
-					ByteBufUtil.writeUtf8(content, res.toString());
-				}
-				if(MediaType.APPLICATION_JSON_UTF8.equals(mediaType)) {
-					ByteBufUtil.writeUtf8(content,JSON.toJSONString(res));
+				if(res instanceof byte[]) {
+					content.writeBytes((byte[])res);
+				} else {
+					if(MediaType.STATIC_RESOURCES.equals(mediaType)) {
+						ByteBufUtil.writeUtf8(content, res.toString());
+					}
+					if(MediaType.APPLICATION_JSON_UTF8.equals(mediaType)) {
+						ByteBufUtil.writeUtf8(content,JSON.toJSONString(res));
+					}
 				}
 			}
 		}
@@ -61,16 +70,27 @@ public class RequestMappingHandlerAdapter {
 //		}
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
         response.headers().set(CONTENT_TYPE,mediaType.value());
-        if(MediaType.AUTO_CONFIGURATION.equals(mediaType)) {
+        if(MediaType.STATIC_RESOURCES.equals(mediaType)) {
             String uri = req.uri();
-            if(uri.endsWith(SUFFIX_HTML)) {
+            if(uri.indexOf(SUFFIX_HTML) != -1) {
+            	response.headers().set(ACCEPT_RANGES,MediaType.BYTES.value());
             	response.headers().set(CONTENT_TYPE,MediaType.TEXT_HTML_UTF8.value());
             }
-            if(uri.endsWith(SUFFIX_JS)) {
+            if(uri.indexOf(SUFFIX_JS) != -1) {
+            	response.headers().set(ACCEPT_RANGES,MediaType.BYTES.value());
             	response.headers().set(CONTENT_TYPE,MediaType.APPLICATION_JAVASCRIPT_UTF8.value());
             }
-            if(uri.endsWith(SUFFIX_CSS)) {
+            if(uri.indexOf(SUFFIX_CSS) != -1) {
+            	response.headers().set(ACCEPT_RANGES,MediaType.BYTES.value());
             	response.headers().set(CONTENT_TYPE,MediaType.TEXT_CSS_UTF8.value());
+            }
+            if(uri.indexOf(SUFFIX_WOFF) !=  -1) {
+            	response.headers().set(ACCEPT_RANGES,MediaType.BYTES.value());
+            	response.headers().set(CONTENT_TYPE,MediaType.APPLICATION_FONT_WOFF.value());
+            }
+            if(uri.indexOf(SUFFIX_TTF) !=  -1) {
+            	response.headers().set(ACCEPT_RANGES,MediaType.BYTES.value());
+            	response.headers().set(CONTENT_TYPE,MediaType.APPLICATION_FONT_TTF.value());
             }
         }
         response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
