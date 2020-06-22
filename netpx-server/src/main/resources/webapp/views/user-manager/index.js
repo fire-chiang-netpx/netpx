@@ -1,7 +1,6 @@
 define(["text!./template.html"], function(template) {
 	return {
 		template : template,
-		style: '.el-switch.is-disabled .el-switch__core, .el-switch.is-disabled .el-switch__label {cursor: pointer;}',
 		data : function() {
 			return {
 				loading: false,

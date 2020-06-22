@@ -10,6 +10,12 @@ define(function(require){
 				path: "/",
 				redirect: "/index"
 		    },{
+		    	path: '/login',
+		        // Vue.extend(require("views/test/index"))
+			    component: function(resolve){
+			        return requirejs(['views/login/index'],resolve);	
+			    }
+		    },{
 		        path: "/index",
 		        // Vue.extend(require("views/test/index"))
 			    component: function(resolve){
